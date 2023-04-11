@@ -31,8 +31,8 @@ public class DevmakerController {
     // Entity를 그대로 내려주는 것은 좋지 않음 -> 안티패턴
     // Dto를 통해 Entity와 응답 데이터를 분리하는 것이 좋음
     @GetMapping("/developers")
-    public List<DeveloperDto> getAllDevelopers() {
-        return devmakerService.getAllDevelopers();
+    public List<DeveloperDto> getAllEmployedDevelopers() {
+        return devmakerService.getAllEmployedDevelopers();
     }
 
     @GetMapping("/developers/{memberId}")
@@ -58,4 +58,15 @@ public class DevmakerController {
     ) {
         return devmakerService.editDeveloper(memberId, request);
     }
+
+
+    @DeleteMapping("/developer/{memberId}")
+    public DeveloperDetailDto deleteDeveloper(
+            @PathVariable String memberId
+    ) {
+
+        return devmakerService.deleteDeveloper(memberId);
+    }
+
+
 }
