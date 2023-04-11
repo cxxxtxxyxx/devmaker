@@ -63,7 +63,7 @@ class DevmakerServiceTest {
             .build();
 
     @Test
-    public void testSomething() {
+    public void getDeveloperDetailTest() {
 
 
         //given
