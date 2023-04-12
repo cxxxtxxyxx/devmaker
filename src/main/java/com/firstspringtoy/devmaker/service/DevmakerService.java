@@ -11,7 +11,6 @@ import com.firstspringtoy.devmaker.entity.RetiredDeveloper;
 import com.firstspringtoy.devmaker.exception.DevmakerException;
 import com.firstspringtoy.devmaker.repository.DeveloperRepository;
 import com.firstspringtoy.devmaker.repository.RetiredDeveloperRepository;
-import com.firstspringtoy.devmaker.type.DeveloperLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -140,10 +139,5 @@ public class DevmakerService {
 
 
     }
-
-    private static void validateDeveloperLevel(DeveloperLevel developerLevel, Integer experienceYears) {
-        developerLevel.validateExperienceYears(experienceYears);
-    }
-
 
 }
