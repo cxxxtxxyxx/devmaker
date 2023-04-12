@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.firstspringtoy.devmaker.code.StatusCode.EMPLOYED;
-import static com.firstspringtoy.devmaker.exception.DevmakerErrorCode.*;
+import static com.firstspringtoy.devmaker.exception.DevmakerErrorCode.DUPLICATED_MEMBER_ID;
+import static com.firstspringtoy.devmaker.exception.DevmakerErrorCode.NO_DEVELOPER;
 
 @Service
 @RequiredArgsConstructor
@@ -121,7 +122,9 @@ public class DevmakerService {
 
     private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
 
-        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(
+                request.getExperienceYears()
+        );
 
         developerRepository.findByMemberId(request.getMemberId()).ifPresent(developer -> {
             throw new DevmakerException(DUPLICATED_MEMBER_ID);
@@ -131,15 +134,15 @@ public class DevmakerService {
 
     private void validateEditDeveloperRequest(EditDeveloper.Request request, String memberId) {
 
-        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(
+                request.getExperienceYears()
+        );
 
 
     }
 
     private static void validateDeveloperLevel(DeveloperLevel developerLevel, Integer experienceYears) {
-        if (experienceYears < developerLevel.getMinExperienceYears() || experienceYears > developerLevel.getMaxExperienceYears()) {
-            throw new DevmakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
+        developerLevel.validateExperienceYears(experienceYears);
     }
 
 
