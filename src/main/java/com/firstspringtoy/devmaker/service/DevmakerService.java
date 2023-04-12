@@ -70,7 +70,7 @@ public class DevmakerService {
 
     @Transactional
     public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
-        validateEditDeveloperRequest(request, memberId);
+        validateEditDeveloperRequest(request);
 
 
         return DeveloperDetailDto.fromEntity(
@@ -131,7 +131,7 @@ public class DevmakerService {
 
     }
 
-    private void validateEditDeveloperRequest(EditDeveloper.Request request, String memberId) {
+    private void validateEditDeveloperRequest(EditDeveloper.Request request) {
 
         request.getDeveloperLevel().validateExperienceYears(
                 request.getExperienceYears()
