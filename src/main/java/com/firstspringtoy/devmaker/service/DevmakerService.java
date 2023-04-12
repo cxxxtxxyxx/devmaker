@@ -12,6 +12,7 @@ import com.firstspringtoy.devmaker.exception.DevmakerException;
 import com.firstspringtoy.devmaker.repository.DeveloperRepository;
 import com.firstspringtoy.devmaker.repository.RetiredDeveloperRepository;
 import com.firstspringtoy.devmaker.type.DeveloperLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,15 @@ public class DevmakerService {
         validateCreateDeveloperRequest(request);
 
 
-        Developer developer = new Developer().builder()
+        return CreateDeveloper.Response.fromEntity(
+                developerRepository.save(
+                        createDeveloperFromRequest(request)
+                )
+        );
+    }
+
+    private Developer createDeveloperFromRequest(@NonNull CreateDeveloper.Request request) {
+        return Developer.builder()
                 .developerLevel(request.getDeveloperLevel())
                 .developerSkillType(request.getDeveloperSkillType())
                 .experienceYears(request.getExperienceYears())
@@ -43,13 +52,10 @@ public class DevmakerService {
                 .age(request.getAge())
                 .statusCode(EMPLOYED)
                 .build();
-
-        developerRepository.save(developer);
-
-
-        return CreateDeveloper.Response.fromEntity(developer);
     }
 
+
+    @Transactional(readOnly = true)
     public List<DeveloperDto> getAllEmployedDevelopers() {
         return developerRepository.findDeveloperByStatusCodeEquals(EMPLOYED)
                 .stream()
@@ -57,27 +63,38 @@ public class DevmakerService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public DeveloperDetailDto getDeveloperDetail(String memberId) {
-        return developerRepository.findByMemberId(memberId)
-                .map(DeveloperDetailDto::fromEntity)
-                .orElseThrow(() -> new DevmakerException(NO_DEVELOPER));
+        return DeveloperDetailDto.fromEntity(getDeveloperByMemberId(memberId));
     }
-
 
     @Transactional
     public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
         validateEditDeveloperRequest(request, memberId);
 
-        Developer developer = developerRepository.findByMemberId(memberId)
-                .orElseThrow(
-                        () -> new DevmakerException(NO_DEVELOPER)
-                );
 
+        return DeveloperDetailDto.fromEntity(
+                getUpdatedDeveloperFromRequest(
+                        request, getDeveloperByMemberId(memberId)
+                )
+        );
+    }
+
+    private Developer getUpdatedDeveloperFromRequest(
+            EditDeveloper.Request request, Developer developer
+    ) {
         developer.setDeveloperLevel(request.getDeveloperLevel());
         developer.setDeveloperSkillType(request.getDeveloperSkillType());
         developer.setExperienceYears(request.getExperienceYears());
 
-        return DeveloperDetailDto.fromEntity(developer);
+        return developer;
+    }
+
+    private Developer getDeveloperByMemberId(String memberId) {
+        return developerRepository.findByMemberId(memberId)
+                .orElseThrow(
+                        () -> new DevmakerException(NO_DEVELOPER)
+                );
     }
 
     @Transactional
@@ -86,10 +103,7 @@ public class DevmakerService {
         // Transactional
         // 1. EMPLOYED -> RETIRED
 
-        Developer developer = developerRepository.findByMemberId(memberId)
-                .orElseThrow(
-                        () -> new DevmakerException(NO_DEVELOPER)
-                );
+        Developer developer = getDeveloperByMemberId(memberId);
 
         developer.setStatusCode(StatusCode.RETIRED);
         // 2. save into RetiredDeveloper
@@ -123,16 +137,7 @@ public class DevmakerService {
     }
 
     private static void validateDeveloperLevel(DeveloperLevel developerLevel, Integer experienceYears) {
-        if (developerLevel == DeveloperLevel.SENIOR && experienceYears < 10) {
-            // custom Exception 만들기
-            throw new DevmakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-
-        if (developerLevel == DeveloperLevel.JUNGNIOR && (experienceYears < 4 || experienceYears > 10)) {
-            throw new DevmakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-
-        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears > 4) {
+        if (experienceYears < developerLevel.getMinExperienceYears() || experienceYears > developerLevel.getMaxExperienceYears()) {
             throw new DevmakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
         }
     }
