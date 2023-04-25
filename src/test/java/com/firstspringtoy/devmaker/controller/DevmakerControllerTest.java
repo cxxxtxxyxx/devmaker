@@ -31,17 +31,50 @@ class DevmakerControllerTest {
     @MockBean
     private DevmakerService devmakerService;
 
-    protected MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getType(), StandardCharsets.UTF_8);
+    protected MediaType contentType = new MediaType(
+            MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getType(),
+            StandardCharsets.UTF_8
+    );
 
     @Test
     void getAllDevelopers() throws Exception {
-        DeveloperDto juniorDeveloperDto = DeveloperDto.builder().developerSkillType(DeveloperSkillType.BACK_END).developerLevel(DeveloperLevel.JUNIOR).memberId("memberId1").build();
+        DeveloperDto juniorDeveloperDto = DeveloperDto.builder()
+                .developerSkillType(DeveloperSkillType.BACK_END)
+                .developerLevel(DeveloperLevel.JUNIOR)
+                .memberId("memberId1").build();
 
-        DeveloperDto seniorDeveloperDto = DeveloperDto.builder().developerSkillType(DeveloperSkillType.FRONT_END).developerLevel(DeveloperLevel.SENIOR).memberId("memberId1").build();
+        DeveloperDto seniorDeveloperDto = DeveloperDto.builder()
+                .developerSkillType(DeveloperSkillType.FRONT_END)
+                .developerLevel(DeveloperLevel.SENIOR)
+                .memberId("memberId1")
+                .build();
 
-        given(devmakerService.getAllEmployedDevelopers()).willReturn(Arrays.asList(juniorDeveloperDto, seniorDeveloperDto));
+        given(devmakerService.getAllEmployedDevelopers())
+                .willReturn(
+                        Arrays.asList(juniorDeveloperDto, seniorDeveloperDto)
+                );
 
-        mockMvc.perform(get("/developers").contentType(contentType)).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$.[0].developerSkillType", is(DeveloperSkillType.BACK_END.name()))).andExpect(jsonPath("$.[0].developerLevel", is(DeveloperLevel.JUNIOR.name()))).andExpect(jsonPath("$.[1].developerSkillType", is(DeveloperSkillType.FRONT_END.name()))).andExpect(jsonPath("$.[1].developerLevel", is(DeveloperLevel.SENIOR.name())));
+        mockMvc.perform(get("/developers")
+                        .contentType(contentType))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath(
+                        "$.[0].developerSkillType",
+                        is(DeveloperSkillType.BACK_END.name()))
+                )
+                .andExpect(jsonPath(
+                        "$.[0].developerLevel",
+                        is(DeveloperLevel.JUNIOR.name()))
+                )
+                .andExpect(jsonPath(
+                        "$.[1].developerSkillType",
+                        is(DeveloperSkillType.FRONT_END.name()))
+                )
+                .andExpect(jsonPath(
+                        "$.[1].developerLevel",
+                        is(DeveloperLevel.SENIOR.name()))
+                );
 
 
     }

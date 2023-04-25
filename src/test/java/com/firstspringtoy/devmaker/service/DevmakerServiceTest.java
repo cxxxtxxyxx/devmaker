@@ -83,7 +83,8 @@ class DevmakerServiceTest {
                 .willReturn(Optional.of(defaultDeveloper));
 
         //when
-        DeveloperDetailDto developerDetail = devmakerService.getDeveloperDetail("memberId");
+        DeveloperDetailDto developerDetail =
+                devmakerService.getDeveloperDetail("memberId");
 
 
         //then
@@ -100,6 +101,7 @@ class DevmakerServiceTest {
 
         given(developerRepository.findByMemberId(anyString()))
                 .willReturn(Optional.empty());
+
         given(developerRepository.save(any()))
                 .willReturn(defaultDeveloper);
 
@@ -107,7 +109,9 @@ class DevmakerServiceTest {
 
 
         //when
-        devmakerService.createDeveloper(getCreateRequest(SENIOR, FRONT_END, 12));
+        devmakerService.createDeveloper(
+                getCreateRequest(SENIOR, FRONT_END, 12)
+        );
 
         //then
         verify(developerRepository, times(1))
@@ -129,7 +133,11 @@ class DevmakerServiceTest {
 
         //when
         //then
-        DevmakerException devmakerException = assertThrows(DevmakerException.class, () -> devmakerService.createDeveloper(getCreateRequest(SENIOR, FRONT_END, 12)));
+        DevmakerException devmakerException = assertThrows(
+                DevmakerException.class, () -> devmakerService.createDeveloper(
+                        getCreateRequest(SENIOR, FRONT_END, 12)
+                )
+        );
 
         assertEquals(DevmakerErrorCode.DUPLICATED_MEMBER_ID, devmakerException.getDevmakerErrorcode());
 
@@ -142,26 +150,26 @@ class DevmakerServiceTest {
 
         //when
         //then
-        DevmakerException devmakerException = assertThrows(DevmakerException.class, () -> devmakerService.createDeveloper(
-                        getCreateRequest(
-                                JUNIOR, FRONT_END, MAX_JUNIOR_EXPERIENCE_YEARS + 1)
+        DevmakerException devmakerException = assertThrows(
+                DevmakerException.class, () -> devmakerService.createDeveloper(
+                        getCreateRequest(JUNIOR, FRONT_END, MAX_JUNIOR_EXPERIENCE_YEARS + 1)
                 )
         );
 
         assertEquals(DevmakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED, devmakerException.getDevmakerErrorcode());
 
-        devmakerException = assertThrows(DevmakerException.class, () -> devmakerService.createDeveloper(
-                        getCreateRequest(
-                                JUNGNIOR, FRONT_END, MIN_SENIOR_EXPERIENCE_YEARS + 1)
+        devmakerException = assertThrows(
+                DevmakerException.class, () -> devmakerService.createDeveloper(
+                        getCreateRequest(JUNGNIOR, FRONT_END, MIN_SENIOR_EXPERIENCE_YEARS + 1)
                 )
         );
 
 
         assertEquals(DevmakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED, devmakerException.getDevmakerErrorcode());
 
-        devmakerException = assertThrows(DevmakerException.class, () -> devmakerService.createDeveloper(
-                        getCreateRequest(
-                                SENIOR, FRONT_END, MIN_SENIOR_EXPERIENCE_YEARS - 1)
+        devmakerException = assertThrows(
+                DevmakerException.class, () -> devmakerService.createDeveloper(
+                        getCreateRequest(SENIOR, FRONT_END, MIN_SENIOR_EXPERIENCE_YEARS - 1)
                 )
         );
 
